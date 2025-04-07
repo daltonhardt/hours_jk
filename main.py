@@ -71,7 +71,7 @@ def process_audio(value, name_of_model, system_instruction, description, type):
     if value:
         with st.spinner("Working..."):
             # audio_file = st.audio(audio_value, format='audio/wav')
-            with NamedTemporaryFile(dir='./tempDir', suffix='.wav', delete=True) as f:  #delete=False mantém o arquivo
+            with NamedTemporaryFile(dir='.', suffix='.wav', delete=True) as f:  #delete=False mantém o arquivo
                 f.write(value.getbuffer())
                 # file_name = os.path.splitext(f.name)[0]
                 file_name = f.name
