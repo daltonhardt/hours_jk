@@ -218,15 +218,18 @@ DESC = (f"Save the result as JSON file using the format {output_json} and always
 
 # Define Gemini AI instructions according to selected language
 instruction = (f"Based on what you understand from the audio, always give the answer in the same language. "
-              f"The target user are mostly carpentry service firms in order to register their daily jobs. "
+              f"The target users are mostly carpentry service firms who want to register their daily jobs. "
               f"It is important to keep track of the persons names, tasks and hours spent by each one. "
               f"The table must be populated exactly with the name of the person, "
               f"the task the person has done and the hours the person has spent on it. "
-              f"Describe the activity in a complete form. "
-              f"If you don't understand a name, write 'not clear', but keep the record of task and hours."
-              f"If the local is not mentioned in the audio use the local {address} "
-              f"Do the job with no verbosity, don't display your comments. "
-              f"If the date is not mentioned in the audio use the date {TODAY} in the format '%b-%d-%Y'. ")
+              f"Describe the activity in a complete way. "
+              f"If the name is not mentioned it means I am talking about me, so consider myself as the person's name. "
+              f"If you don't understand a name, write 'not clear' (never invent a name). "
+              f"If the local is not clearly mentioned in the audio you may use the current geolocation {address}. "
+              f"If the date is not mentioned in the audio use the date {TODAY} in the format '%b-%d-%Y'."
+              f"Identify the day in the week according to the current date so that if the user says 'this monday' or "
+              f"'yesterday' or 'last wednesday' you may understand the correct date. "
+              f"Do the job with no verbosity, don't display your comments. ")
 
 # Choosing the Gemini model
 # model_name = "gemini-1.5-flash"
