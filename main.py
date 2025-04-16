@@ -39,7 +39,7 @@ def get_location():
         location = geolocator.reverse((lat, lon), exactly_one=True)
         return location.address if location else "Oops, address not found."
     else:
-        return "Oops, Lat/Lon not found."
+        return "Oops, location not found."
 
 # function to define the html table pattern
 def html_table_format():
@@ -57,7 +57,7 @@ def html_table_format():
                 </tr>
                 <tr style="background-color: #99ff99; border: none;">
                     <td style="text-align: center; border: none;">Name</th>
-                    <td style="text-align: center; border: none;">Activity</th>
+                    <td style="text-align: center; border: none;">Task</th>
                     <td style="text-align: center; border: none;">Hours</th>
                 </tr>
             </table>
@@ -96,17 +96,14 @@ def extract_html_blocks(text):
 # function to define the JSON pattern
 def json_format():
     out = '''
-        {
-          "location": "place where the work was done",
-          "date": "date when the work was done",
-          "entries":
-          [
-            {"name": "worker's name", "activity": "Description of the task", "hours": X},
-            {"name": "worker's name", "activity": "Description of the task", "hours": X}
-          ],
-          "total_hours": X
-        }
-        '''
+            { "name": "worker's name",
+              "task": "Description of the task",
+              "hours": "hours as decimal number' ,
+              "location": "place where the work was done",
+              "date": "date when the work was done",
+              "day_of_week": "day of the week"
+            }
+            '''
     return out
 
 # function to process the audio file
@@ -116,7 +113,7 @@ def process_audio(value, name_of_model, system_instruction, description):
     if value:
         with st.spinner("Working..."):
             # audio_file = st.audio(audio_value, format='audio/wav')
-            with NamedTemporaryFile(dir='.', suffix='.wav', delete=True) as f:  #delete=False keep the file
+            with NamedTemporaryFile(dir='./', suffix='.wav', delete=True) as f:  #delete=False keep the file
                 f.write(value.getbuffer())
                 file_name = f.name
                 # print('\n ==================')
@@ -128,10 +125,11 @@ def process_audio(value, name_of_model, system_instruction, description):
 
             # load mp3 audio file
             audio_file = genai.upload_file(new_file)
+
             # get result from AI model
             result = model.generate_content([audio_file, description])
-            # print("=====  Total output  =====")
-            # print(result.text)
+            print("=====  Total output  =====")
+            print(result.text)
 
             # Extract JSONs from the text
             json_text = result.text
@@ -213,6 +211,7 @@ if 'Oops' not in address:
 
 output_html = html_table_format()
 output_json = json_format()
+# DESC = f"Put the result in a JSON file using the format {output_json} and always sum the total worked hours."
 DESC = (f"Save the result as JSON file using the format {output_json} and always sum the total worked hours per day."
         f"Create an html table using the format {output_html} and sum the total worked hours per day in bold format.")
 
@@ -220,21 +219,28 @@ DESC = (f"Save the result as JSON file using the format {output_json} and always
 instruction = (f"Based on what you understand from the audio, always give the answer in the same language. "
               f"The target users are mostly carpentry service firms who want to register their daily jobs. "
               f"It is important to keep track of the persons names, tasks and hours spent by each one. "
-              f"The table must be populated exactly with the name of the person, "
-              f"the task the person has done and the hours the person has spent on it. "
-              f"Describe the activity in a complete way. "
-              f"If the name is not mentioned it means I am talking about me, so consider myself as the person's name. "
-              f"If you don't understand a name, write 'not clear' (never invent a name). "
-              f"If the local is not clearly mentioned in the audio you may use the current geolocation {address}. "
-              f"If the date is not mentioned in the audio use the date {TODAY} in the format '%b-%d-%Y'."
+              f"Return the information as a JSON list of dictionaries. Each dictionary in the list must have the "
+              f"following keys: 'name', 'task', 'hours', 'local', 'date', and 'day_of_week'. "
+              f"Populate the 'name' field exactly with the person's name. "
+              f"The 'task' field should contain a complete description of the activity performed. "
+              f"The 'hours' field should contain the number of hours spent on the task as a decimal number (e.g.,'3.5')."
+              f"If the name is not mentioned it means I am talking about me, so consider 'Myself' as the person's name."
+              f"If you don't understand a name, write 'no name' (never create or invent a name). "
+              f"Give your best to identify the name of the local where the job was done, e.g., 'building X', "
+              f"'house of Y', 'my house', 'park X', 'hotel Y', 'fabric X', and so on. "
+              f"In case the local is not clearly mentioned in the audio or you are not able to understand,"
+              f"use the current geolocation '{address}' when available, otherwise use 'local not clear'. "
+              f"If the date is not mentioned in the audio use the current date '{TODAY}' in the format '%b-%d-%Y'. "
               f"Identify the day in the week according to the current date so that if the user says 'this monday' or "
               f"'yesterday' or 'last wednesday' you may understand the correct date. "
+              f"If the audio mentions multiple people and their tasks, create a separate dictionary for each "
+              f"person-task-hours combination in the list. "
               f"Do the job with no verbosity, don't display your comments. ")
 
 # Choosing the Gemini model
-# model_name = "gemini-1.5-flash"
 model_name = "gemini-2.0-flash"
 # model_name = "gemini-2.0-flash-Lite"
+# model_name = "gemini-1.5-flash"
 
 # --- starting STREAMLIT
 # st.set_page_config(layout="wide")
