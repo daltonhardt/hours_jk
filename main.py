@@ -48,6 +48,7 @@ def get_location():
 def html_table_format():
     out = f'''
         <body>
+            <hr> <!-- Linha horizontal antes da tabela -->
             <table style="width:100%; border-collapse: collapse;">
                 <tr style="background-color:#99ff99;">
                     <th colspan="3" align="center">WORKING HOURS</th>
@@ -59,9 +60,15 @@ def html_table_format():
                     <th colspan="3" style="padding: 0.5em 0 0.5em 0; text-align: center; border: none;">Local: </th>
                 </tr>
                 <tr style="background-color: #99ff99; border: none;">
-                    <td style="text-align: center; border: none;">Name</th>
-                    <td style="text-align: center; border: none;">Task</th>
-                    <td style="text-align: center; border: none;">Hours</th>
+                    <td style="text-align: center; padding: 0.05em; border: none;">Name</th>
+                    <td style="text-align: center; padding: 0.05em; border: none;">Task</th>
+                    <td style="text-align: center; padding: 0.05em; border: none;">Hours</th>
+                </tr>
+                <!-- Exemplo de preenchimento -->
+                <tr>
+                    <td style="padding: 0.25em; border: none;">John</td>
+                    <td style="padding: 0.25em; border: none; text-align: center;">Cutting</td>
+                    <td style="padding: 0.25em; border: none;">4.0</td>
                 </tr>
             </table>
         </body>
