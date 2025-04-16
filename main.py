@@ -30,16 +30,19 @@ for name, l in logging.root.manager.loggerDict.items():
 
 # function to get geolocation using java connection
 def get_location():
-    local = get_geolocation()
-    if local:
-        lat = local['coords']['latitude']
-        lon = local['coords']['longitude']
-        # st.text(f"Lat.: {lat}   Lon.: {lon}")
-        geolocator = Nominatim(user_agent="geo_localization")
-        location = geolocator.reverse((lat, lon), exactly_one=True)
-        return location.address if location else "Oops, address not found."
-    else:
-        return "Oops, location not found."
+    try:
+        local = get_geolocation()
+        if local:
+            lat = local['coords']['latitude']
+            lon = local['coords']['longitude']
+            # st.text(f"Lat.: {lat}   Lon.: {lon}")
+            geolocator = Nominatim(user_agent="geo_localization")
+            location = geolocator.reverse((lat, lon), exactly_one=True)
+            return location.address if location else "Oops, address not found."
+        else:
+            return "Oops, location not found."
+    except "ReadTimeoutError":
+        return "Oops, could not get your location."
 
 # function to define the html table pattern
 def html_table_format():
