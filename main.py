@@ -48,7 +48,7 @@ def get_location():
 def html_table_format():
     out = f'''
         <body>
-            <hr> <!-- Linha horizontal antes da tabela -->
+            <hr> <!-- Horizontal line before the table -->
             <table style="width:100%; border-collapse: collapse;">
                 <tr style="background-color:#99ff99;">
                     <th colspan="3" align="center">WORKING HOURS</th>
@@ -64,7 +64,7 @@ def html_table_format():
                     <td style="text-align: center; padding: 0.05em; border: none;">Task</th>
                     <td style="text-align: center; padding: 0.05em; border: none;">Hours</th>
                 </tr>
-                <!-- Exemplo de preenchimento -->
+                <!-- table example -->
                 <tr>
                     <td style="padding: 0.25em; border: none;">John</td>
                     <td style="padding: 0.25em; border: none; text-align: center;">Cutting</td>
@@ -138,8 +138,8 @@ def process_audio(value, name_of_model, system_instruction, description):
 
             # get result from AI model
             result = model.generate_content([audio_file, description])
-            print("=====  Total output  =====")
-            print(result.text)
+            # print("=====  Total output  =====")
+            # print(result.text)
 
             # Extract JSONs from the text
             json_text = result.text
@@ -204,15 +204,11 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 apikey = st.secrets.google_api["apikey"]
 genai.configure(api_key=apikey)
 
-# --- LOCAL configurations
-# set the locale to Spanish (Spain)
-# locale.setlocale(locale.LC_NUMERIC, 'es_ES.UTF-8')
-
 # Get current datetime
 current_datetime = datetime.now()
 # Convert to string and format
-datetime_string = current_datetime.strftime('%b-%d-%Y')
-TODAY = datetime.strptime(datetime.now().strftime("%b-%d-%Y"), "%b-%d-%Y")
+# datetime_string = current_datetime.strftime('%d-%b-%Y')
+TODAY = datetime.strptime(datetime.now().strftime("%d-%b-%Y"), "%d-%b-%Y")
 # Get current location
 address = get_location()
 if 'Oops' not in address:
@@ -225,8 +221,10 @@ output_json = json_format()
 DESC = (f"Save the result as JSON file using the format {output_json} and always sum the total worked hours per day."
         f"Create an html table using the format {output_html} and sum the total worked hours per day in bold format.")
 
-# Define Gemini AI instructions according to selected language
-instruction = (f"Based on what you understand from the audio, always give the answer in the same language. "
+# Define Gemini AI instructions
+instruction = (f"Based on what you understand from the audio, always give the answer in the same language. For example,"
+              f" if the user is speaking in Brazilian Portuguese, all responses must be in Brazilian Portuguese. "
+              f"If the user is speaking in Spanish, all responses must be in Spanish, and the same happens for English."
               f"The target users are mostly carpentry service firms who want to register their daily jobs. "
               f"It is important to keep track of the persons names, tasks and hours spent by each one. "
               f"Return the information as a JSON list of dictionaries. Each dictionary in the list must have the "
@@ -235,9 +233,10 @@ instruction = (f"Based on what you understand from the audio, always give the an
               f"The 'task' field should contain a complete description of the activity performed. "
               f"The 'hours' field should contain the number of hours spent on the task as a decimal number (e.g.,'3.5')."
               f"If the name is not mentioned it means I am talking about me, so consider 'Myself' as the person's name."
-              f"If you don't understand a name, write 'no name' (never create or invent a name). "
+              f"Of course, if the audio is in brazilian portuguese you have to use 'Eu' or 'Yo' if it is in Spanish."
+              f"If you don't understand a name, write '???' (never create or invent a name). "
               f"Give your best to identify the name of the local where the job was done, e.g., 'building X', "
-              f"'house of Y', 'my house', 'park X', 'hotel Y', 'fabric X', and so on. "
+              f"'house of Y', 'my house', 'park X', 'hotel Y', 'company X', 'firm Z' and so on. "
               f"In case the local is not clearly mentioned in the audio or you are not able to understand,"
               f"use the current geolocation '{address}' when available, otherwise use 'local not clear'. "
               f"If the date is not mentioned in the audio use the current date '{TODAY}' in the format '%b-%d-%Y'. "
@@ -248,9 +247,9 @@ instruction = (f"Based on what you understand from the audio, always give the an
               f"Do the job with no verbosity, don't display your comments. ")
 
 # Choosing the Gemini model
+# model_name = "gemini-1.5-flash"
 model_name = "gemini-2.0-flash"
 # model_name = "gemini-2.0-flash-Lite"
-# model_name = "gemini-1.5-flash"
 
 # --- starting STREAMLIT
 # st.set_page_config(layout="wide")
