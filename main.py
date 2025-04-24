@@ -4,6 +4,7 @@
 # Author        : Dalton Hardt
 # Date          : April 2025
 # Last revision : April 2025
+VERSION = '1.25.4'
 #################################################
 import google.generativeai as genai
 import streamlit as st
@@ -207,7 +208,6 @@ genai.configure(api_key=apikey)
 # Get current datetime
 current_datetime = datetime.now()
 # Convert to string and format
-# datetime_string = current_datetime.strftime('%d-%b-%Y')
 TODAY = datetime.strptime(datetime.now().strftime("%d-%b-%Y"), "%d-%b-%Y")
 # Get current location
 address = get_location()
@@ -215,9 +215,9 @@ if 'Oops' not in address:
     add = address.split(', ')
     address = f'{add[0]}, {add[1]}, {add[3]}'
 
+# Define Gemini AI table format, json format and description
 output_html = html_table_format()
 output_json = json_format()
-# DESC = f"Put the result in a JSON file using the format {output_json} and always sum the total worked hours."
 DESC = (f"Save the result as JSON file using the format {output_json} and always sum the total worked hours per day."
         f"Create an html table using the format {output_html} and sum the total worked hours per day in bold format.")
 
@@ -255,7 +255,7 @@ model_name = "gemini-2.0-flash"
 # st.set_page_config(layout="wide")
 st.header('Jair Construction, LLC.')
 st.subheader('Daily Work Report')
-st.text(f'- powered by Google generative AI model {model_name}')
+st.text(f'v{VERSION} - powered by Google generative AI model {model_name}')
 st.divider()
 
 # Enter the audio
