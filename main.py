@@ -4,7 +4,7 @@
 # Author        : Dalton Hardt
 # Date          : April 2025
 # Last revision : April 2025
-VERSION = '1.25.4'
+VERSION = '1.25.5'
 #################################################
 import google.generativeai as genai
 import streamlit as st
