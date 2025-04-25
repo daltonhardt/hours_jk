@@ -85,7 +85,7 @@ def extract_json_blocks(text):
     for i, char in enumerate(text):
         if char == '{':
             stack.append(char)
-            if len(stack) == 1:  # First '{' the begin of JSON
+            if len(stack) == 1:  # First '{' the beginning of JSON
                 json_start = i
         elif char == '}':
             stack.pop()
@@ -107,12 +107,12 @@ def extract_html_blocks(text):
 # function to define the JSON pattern
 def json_format():
     out = '''
-            { "name": "worker's name",
-              "task": "Description of the task",
-              "hours": "hours as decimal number' ,
+            { "date": "date when the work was done",
+              "weekday": "day of the week"
               "location": "place where the work was done",
-              "date": "date when the work was done",
-              "day_of_week": "day of the week"
+              "name": "worker's name",
+              "task": "Description of the task",
+              "hours": "hours as decimal number'
             }
             '''
     return out
@@ -188,7 +188,10 @@ def process_audio(value, name_of_model, system_instruction, description):
                 )
         with action2:  # download JSON file
             json_string = json.dumps(json_objects, ensure_ascii=False)  #ensure_Ascii=False for UTF-8 characters
+            # display string in JSON format
             # st.json(json_string, expanded=True)
+
+            # Save Data button to save JSON file locally
             st.download_button(
                 label='Save data',
                 data=json_string,
@@ -196,6 +199,10 @@ def process_audio(value, name_of_model, system_instruction, description):
                 mime="application/json",
                 icon=":material/download:"
             )
+            # Convert string to a list of dictionary
+            # json_data = json.loads(json_string)
+            # for row in json_data:
+            #     print(list(row.values()))
 
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
@@ -204,6 +211,10 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 # Read Gemini API-Key credentials stored in secrets.toml file
 apikey = st.secrets.google_api["apikey"]
 genai.configure(api_key=apikey)
+
+# --- LOCAL configurations
+# set the locale to Spanish (Spain)
+# locale.setlocale(locale.LC_NUMERIC, 'es_ES.UTF-8')
 
 # Get current datetime
 current_datetime = datetime.now()
@@ -228,23 +239,25 @@ instruction = (f"Based on what you understand from the audio, always give the an
               f"The target users are mostly carpentry service firms who want to register their daily jobs. "
               f"It is important to keep track of the persons names, tasks and hours spent by each one. "
               f"Return the information as a JSON list of dictionaries. Each dictionary in the list must have the "
-              f"following keys: 'name', 'task', 'hours', 'local', 'date', and 'day_of_week'. "
+              f"following keys: 'date', 'weekday', 'location', 'name', 'task' and 'hours'."
               f"Populate the 'name' field exactly with the person's name. "
               f"The 'task' field should contain a complete description of the activity performed. "
               f"The 'hours' field should contain the number of hours spent on the task as a decimal number (e.g.,'3.5')."
-              f"If the name is not mentioned it means I am talking about me, so consider 'Myself' as the person's name."
-              f"Of course, if the audio is in brazilian portuguese you have to use 'Eu' or 'Yo' if it is in Spanish."
-              f"If you don't understand a name, write '???' (never create or invent a name). "
+              f"If the name is not mentioned and the audio is in Portuguese, refer as 'Eu'. "
+              f"If the name is not mentioned and the audio is in Spanish, refer as 'Yo'. "
+              f"If the name is not mentioned and the audio is in English, refer as 'Myself'. "
+              f"If you don't understand a name, write '_???_' (never create or invent a name). "
               f"Give your best to identify the name of the local where the job was done, e.g., 'building X', "
               f"'house of Y', 'my house', 'park X', 'hotel Y', 'company X', 'firm Z' and so on. "
-              f"In case the local is not clearly mentioned in the audio or you are not able to understand,"
-              f"use the current geolocation '{address}' when available, otherwise use 'local not clear'. "
-              f"If the date is not mentioned in the audio use the current date '{TODAY}' in the format '%b-%d-%Y'. "
+              f"Only if the location is not clearly mentioned in the audio or you are not able to understand,"
+              f"you are allowed to use the current geolocation '{address}' when available, otherwise write '_???_'. "
+              f"If the date is not mentioned in the audio use the current date '{TODAY}' in the format '%d-%b-%Y'. "
               f"Identify the day in the week according to the current date so that if the user says 'this monday' or "
               f"'yesterday' or 'last wednesday' you may understand the correct date. "
               f"If the audio mentions multiple people and their tasks, create a separate dictionary for each "
               f"person-task-hours combination in the list. "
-              f"Do the job with no verbosity, don't display your comments. ")
+              f"Do the job with no verbosity, don't display your comments. "
+              f"Always populate the HTML and JSON files in the same audio language. Don't translate anything.")
 
 # Choosing the Gemini model
 # model_name = "gemini-1.5-flash"
@@ -265,6 +278,6 @@ st.markdown("- :red-background[**the date**], if not mentioned the system will a
 st.markdown("- :blue-background[**the names of the workers**]")
 st.markdown("- :red-background[**the activities developed by each worker**]")
 st.markdown("- :blue-background[**the hours spent on each activity by each worker**]")
-st.markdown("Press the microphone icon bellow to start speaking and press again when finished.")
+st.markdown("Press the microphone icon bellow to start speaking and press it again when finished.")
 audio_value = st.audio_input("")
 process_audio(audio_value, model_name, instruction, DESC)
